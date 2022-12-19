@@ -13,7 +13,12 @@ func main() {
 	if err != nil {
 		log.Fatalf("Erro ao inicializar database: %+v", err)
 	}
-	defer database.Close()
+
+	sqlDB, err := database.DB()
+	if err != nil {
+		log.Fatalf("Erro ao inicializar sql: %+v", err)
+	}
+	defer sqlDB.Close()
 
 	e := echo.New()
 	e.GET("/", func(c echo.Context) error {

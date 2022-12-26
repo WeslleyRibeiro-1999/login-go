@@ -1,17 +1,20 @@
 package src
 
 import (
-	"github.com/WeslleyRibeiro-1999/login-go/database"
 	"github.com/WeslleyRibeiro-1999/login-go/models"
+	"gorm.io/gorm"
 )
 
-func SingUp(user *models.User) (*models.User, error) {
-	db, err := database.NewDatabase()
-	if err != nil {
-		return nil, err
-	}
+type repository struct {
+	db *gorm.DB
+}
 
-	if err := db.Create(&user).Error; err != nil {
+func NewRepository(db *gorm.DB) *repository {
+	return &repository{db}
+}
+
+func (r *repository) SingUp(user *models.User) (*models.User, error) {
+	if err := r.db.Create(&user).Error; err != nil {
 		return nil, err
 	}
 

@@ -2,13 +2,16 @@ package src
 
 import (
 	"testing"
-	"time"
 
+	"github.com/WeslleyRibeiro-1999/login-go/database"
 	"github.com/WeslleyRibeiro-1999/login-go/models"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestRepository_SingUp(t *testing.T) {
+	db, err := database.NewDatabase()
+	assert.NoError(t, err, "sem erro ao inicializar o banco de dados")
+	repository := NewRepository(db)
 
 	type args struct {
 		user *models.User
@@ -22,32 +25,32 @@ func TestRepository_SingUp(t *testing.T) {
 			name: "devem ser iguais",
 			args: args{
 				user: &models.User{
-					ID:        1,
+					ID:        20,
 					FirstName: "Weslley",
 					LastName:  "Jose",
 					Email:     "teste@teste.com",
 					Password:  "teste123",
-					CreatedAt: time.Date(2010, time.October, 20, 10, 5, 30, 10, time.Local),
-					UpdatedAt: time.Date(2010, time.October, 10, 10, 5, 30, 10, time.Local),
 				},
 			},
 			want: &models.User{
-				ID:        1,
+				ID:        20,
 				FirstName: "Weslley",
 				LastName:  "Jose",
 				Email:     "teste@teste.com",
 				Password:  "teste123",
-				CreatedAt: time.Date(2010, time.October, 20, 10, 5, 30, 10, time.Local),
-				UpdatedAt: time.Date(2010, time.October, 10, 10, 5, 30, 10, time.Local),
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := SingUp(tt.args.user)
-			t.Logf("RETORNO: %v", got)
-			assert.NotNil(t, err, "tem que ser vazio")
-			assert.Equal(t, tt.want, got, "devem ser iguais")
+			user, err := repository.SingUp(tt.args.user)
+			assert.Nil(t, err, "tem que ser vazio")
+
+			assert.Equal(t, tt.want.ID, user.ID, "devem ser iguais")
+			assert.Equal(t, tt.want.Email, user.Email, "devem ser iguais")
+			assert.Equal(t, tt.want.Password, user.Password, "devem ser iguais")
+
+			repository.db.Delete(models.User{ID: tt.args.user.ID})
 		})
 	}
 }

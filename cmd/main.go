@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/WeslleyRibeiro-1999/login-go/database"
+	"github.com/WeslleyRibeiro-1999/login-go/src"
 	"github.com/labstack/echo/v4"
 )
 
@@ -19,6 +20,8 @@ func main() {
 		log.Fatalf("Erro ao inicializar sql: %+v", err)
 	}
 	defer sqlDB.Close()
+
+	src.NewRepository(database)
 
 	e := echo.New()
 	e.GET("/", func(c echo.Context) error {

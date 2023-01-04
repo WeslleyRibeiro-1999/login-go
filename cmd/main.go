@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/WeslleyRibeiro-1999/login-go/database"
-	"github.com/WeslleyRibeiro-1999/login-go/src"
+	src "github.com/WeslleyRibeiro-1999/login-go/src/repository"
 	"github.com/labstack/echo/v4"
 )
 

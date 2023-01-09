@@ -1,4 +1,4 @@
-package src
+package repository
 
 import (
 	"testing"
@@ -6,6 +6,7 @@ import (
 	"github.com/WeslleyRibeiro-1999/login-go/database"
 	"github.com/WeslleyRibeiro-1999/login-go/models"
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func TestRepository_SingUp(t *testing.T) {
@@ -48,7 +49,8 @@ func TestRepository_SingUp(t *testing.T) {
 
 			assert.Equal(t, tt.want.ID, user.ID, "devem ser iguais")
 			assert.Equal(t, tt.want.Email, user.Email, "devem ser iguais")
-			assert.Equal(t, tt.want.Password, user.Password, "devem ser iguais")
+			passwordErr := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(tt.want.Password))
+			assert.NoError(t, passwordErr, "senha nao retornada conforme esperada")
 		})
 	}
 }
@@ -86,7 +88,8 @@ func TestSignIn(t *testing.T) {
 
 			assert.Equal(t, tt.want.ID, user.ID, "IDs devem ser iguais")
 			assert.Equal(t, tt.want.Email, user.Email, "emails devem ser iguais")
-			assert.Equal(t, tt.want.Password, user.Password)
+			passwordErr := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(tt.want.Password))
+			assert.NoError(t, passwordErr, "senha nao retornada conforme esperada")
 		})
 	}
 

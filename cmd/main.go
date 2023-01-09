@@ -2,10 +2,10 @@ package main
 
 import (
 	"log"
-	"net/http"
 
 	"github.com/WeslleyRibeiro-1999/login-go/database"
-	src "github.com/WeslleyRibeiro-1999/login-go/src/repository"
+	"github.com/WeslleyRibeiro-1999/login-go/src/api"
+	repository "github.com/WeslleyRibeiro-1999/login-go/src/repository"
 	"github.com/labstack/echo/v4"
 )
 
@@ -21,11 +21,9 @@ func main() {
 	}
 	defer sqlDB.Close()
 
-	src.NewRepository(database)
+	repository.NewRepository(database)
 
 	e := echo.New()
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "HELLO WORLD!")
-	})
+	e.POST("/singup", api.CreateUser)
 	e.Logger.Fatal(e.Start(":8083"))
 }

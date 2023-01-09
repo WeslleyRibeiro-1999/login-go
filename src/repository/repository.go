@@ -1,7 +1,8 @@
-package src
+package repository
 
 import (
 	"github.com/WeslleyRibeiro-1999/login-go/models"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -14,6 +15,12 @@ func NewRepository(db *gorm.DB) *repository {
 }
 
 func (r *repository) SingUp(user *models.User) (*models.User, error) {
+	newPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, err
+	}
+	user.Password = string(newPassword)
+
 	if err := r.db.Create(&user).Error; err != nil {
 		return nil, err
 	}
@@ -23,7 +30,13 @@ func (r *repository) SingUp(user *models.User) (*models.User, error) {
 
 func (r *repository) SignIn(login *models.UserLogin) (*models.User, error) {
 	var user models.User
-	if err := r.db.Take(&models.User{Email: login.Email, Password: login.Password}).Take(&user).Error; err != nil {
+
+	password, err := bcrypt.GenerateFromPassword([]byte(login.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := r.db.Take(&models.User{Email: login.Email, Password: string(password)}).Take(&user).Error; err != nil {
 		return nil, err
 	}
 

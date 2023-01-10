@@ -6,32 +6,53 @@ import (
 	"gorm.io/gorm"
 )
 
+type Repository interface {
+	SingUp(user *models.User) (*models.UserResponse, error)
+	SignIn(login *models.UserLogin) (*models.User, error)
+}
+
 type repository struct {
 	db *gorm.DB
 }
 
-func NewRepository(db *gorm.DB) *repository {
+var _ Repository = (*repository)(nil)
+
+func NewRepository(db *gorm.DB) Repository {
 	return &repository{db}
 }
 
-func (r *repository) SingUp(user *models.User) (*models.User, error) {
-	newPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+func (r *repository) SingUp(user *models.User) (*models.UserResponse, error) {
+	passwordHash, err := CriptografarSenha(user.Password)
 	if err != nil {
 		return nil, err
 	}
-	user.Password = string(newPassword)
+	user.Password = string(passwordHash)
 
 	if err := r.db.Create(&user).Error; err != nil {
 		return nil, err
 	}
 
-	return user, nil
+	userResponse := &models.UserResponse{
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+		Email:     user.Email,
+	}
+
+	return userResponse, nil
+}
+
+func CriptografarSenha(password string) (string, error) {
+	newPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+	return string(newPassword), nil
 }
 
 func (r *repository) SignIn(login *models.UserLogin) (*models.User, error) {
 	var user models.User
 
-	password, err := bcrypt.GenerateFromPassword([]byte(login.Password), bcrypt.DefaultCost)
+	password, err := CriptografarSenha(login.Password)
 	if err != nil {
 		return nil, err
 	}

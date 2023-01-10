@@ -12,6 +12,12 @@ type User struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+type UserResponse struct {
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Email     string `json:"email"`
+}
+
 type UserLogin struct {
 	Email    string `json:"email" validate:"required"`
 	Password string `json:"password" validate:"required"`

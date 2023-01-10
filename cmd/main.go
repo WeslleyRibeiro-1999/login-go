@@ -6,7 +6,7 @@ import (
 	"github.com/WeslleyRibeiro-1999/login-go/database"
 	"github.com/WeslleyRibeiro-1999/login-go/src/api"
 	repository "github.com/WeslleyRibeiro-1999/login-go/src/repository"
-	"github.com/labstack/echo/v4"
+	"github.com/gofiber/fiber/v2"
 )
 
 func main() {
@@ -21,9 +21,12 @@ func main() {
 	}
 	defer sqlDB.Close()
 
-	repository.NewRepository(database)
+	repo := repository.NewRepository(database)
 
-	e := echo.New()
-	e.POST("/singup", api.CreateUser)
-	e.Logger.Fatal(e.Start(":8083"))
+	loginHandler := api.NewHandler(repo)
+
+	app := fiber.New()
+	app.Post("/signin", loginHandler.CreateUser)
+	app.Listen(":3000")
+
 }
